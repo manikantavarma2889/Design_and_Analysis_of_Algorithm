@@ -1,0 +1,74 @@
+import java.util.Random;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+
+public class Task5a {
+
+    static class ParallelMergeSort extends RecursiveAction {
+        private int[] arr;
+        private int low, high;
+
+        ParallelMergeSort(int[] arr, int low, int high) {
+            this.arr = arr;
+            this.low = low;
+            this.high = high;
+        }
+
+        @Override
+        protected void compute() {
+            if (low < high) {
+                int mid = (low + high) / 2;
+
+                ParallelMergeSort left = new ParallelMergeSort(arr, low, mid);
+                ParallelMergeSort right = new ParallelMergeSort(arr, mid + 1, high);
+
+                // Execute sub-tasks in parallel
+                invokeAll(left, right);
+
+                merge(arr, low, mid, high);
+            }
+        }
+
+        private void merge(int[] arr, int low, int mid, int high) {
+            int[] temp = new int[high - low + 1];
+            int i = low, j = mid + 1, k = 0;
+
+            while (i <= mid && j <= high) {
+                if (arr[i] <= arr[j])
+                    temp[k++] = arr[i++];
+                else
+                    temp[k++] = arr[j++];
+            }
+
+            while (i <= mid) temp[k++] = arr[i++];
+            while (j <= high) temp[k++] = arr[j++];
+
+            System.arraycopy(temp, 0, arr, low, temp.length);
+        }
+    }
+
+    static void generateRandom(int[] arr, int n) {
+        Random rand = new Random();
+        for (int i = 0; i < n; i++)
+            arr[i] = rand.nextInt(10000);
+    }
+
+    public static void main(String[] args) {
+        ForkJoinPool pool = new ForkJoinPool(5); // 5 parallel threads like OpenMP example
+        int[] arr = new int[10000];
+
+        System.out.println("Num\tTime (seconds)");
+        for (int n = 100; n <= 10000; n += 100) {
+            generateRandom(arr, n);
+
+            long startTime = System.nanoTime();
+            pool.invoke(new ParallelMergeSort(arr, 0, n - 1));
+            long endTime = System.nanoTime();
+
+            double timeSeconds = (endTime - startTime) / 1_000_000_000.0;
+            System.out.printf("%d\t%.6f\n", n, timeSeconds);
+        }
+
+        pool.shutdown();
+    }
+}

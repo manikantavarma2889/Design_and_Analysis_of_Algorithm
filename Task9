@@ -1,0 +1,94 @@
+import java.util.*;
+
+public class DijkstraAlgorithm {
+    static final int IN = 99; // Represents infinity
+    static final int N = 6;   // Number of nodes
+
+    // Dijkstra’s algorithm function
+    static int dijkstra(int[][] cost, int source, int target) {
+        int[] dist = new int[N];
+        int[] prev = new int[N];
+        boolean[] selected = new boolean[N];
+
+        Arrays.fill(dist, IN);
+        Arrays.fill(prev, -1);
+
+        dist[source] = 0;
+        selected[source] = true;
+        int start = source;
+
+        while (!selected[target]) {
+            int min = IN, m = -1;
+
+            // Update distances to adjacent vertices
+            for (int i = 0; i < N; i++) {
+                int d = dist[start] + cost[start][i];
+                if (d < dist[i] && !selected[i]) {
+                    dist[i] = d;
+                    prev[i] = start;
+                }
+                if (dist[i] < min && !selected[i]) {
+                    min = dist[i];
+                    m = i;
+                }
+            }
+
+            if (m == -1) break; // No connection
+            start = m;
+            selected[start] = true;
+        }
+
+        // Build the shortest path
+        List<Character> path = new ArrayList<>();
+        int node = target;
+        while (node != -1) {
+            path.add((char) (node + 65)); // Convert to letter A, B, C...
+            node = prev[node];
+        }
+        Collections.reverse(path);
+
+        System.out.print("Shortest Path: ");
+        for (char p : path)
+            System.out.print(p + " ");
+        System.out.println();
+
+        return dist[target];
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int[][] cost = new int[N][N];
+
+        System.out.println("\tThe Shortest Path Algorithm (DIJKSTRA’S ALGORITHM in Java)\n");
+
+        // Initialize all paths to infinity
+        for (int i = 0; i < N; i++)
+            Arrays.fill(cost[i], IN);
+
+        // Input the weighted edges
+        for (int x = 0; x < N - 1; x++) {
+            for (int y = x + 1; y < N; y++) {
+                System.out.printf("Enter the weight of the path between nodes %d and %d: ", x, y);
+                int w = sc.nextInt();
+                if (w < 0) {
+                    System.out.println("Dijkstra’s Algorithm cannot handle negative weights.");
+                    sc.close();
+                    return;
+                }
+                cost[x][y] = cost[y][x] = w;
+            }
+            System.out.println();
+        }
+
+        System.out.print("Enter the source (0–5): ");
+        int source = sc.nextInt();
+
+        System.out.print("Enter the target (0–5): ");
+        int target = sc.nextInt();
+
+        int shortestDistance = dijkstra(cost, source, target);
+        System.out.println("\nShortest Path Distance: " + shortestDistance);
+
+        sc.close();
+    }
+}

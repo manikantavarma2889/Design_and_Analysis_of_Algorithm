@@ -1,0 +1,94 @@
+import java.util.*;
+
+class Edge implements Comparable<Edge> {
+    int u, v, w;
+
+    public int compareTo(Edge other) {
+        return this.w - other.w; // Sort by weight
+    }
+}
+
+public class KruskalAlgorithm {
+    static int V; // Number of vertices
+    static int[][] graph;
+    static int[] parent;
+
+    // Find set (with path compression)
+    static int find(int i) {
+        while (parent[i] != i)
+            i = parent[i];
+        return i;
+    }
+
+    // Union operation
+    static void union(int i, int j) {
+        int a = find(i);
+        int b = find(j);
+        parent[a] = b;
+    }
+
+    // Kruskal’s Algorithm
+    static void kruskalMST() {
+        List<Edge> edges = new ArrayList<>();
+
+        // Collect all edges
+        for (int i = 0; i < V; i++) {
+            for (int j = i + 1; j < V; j++) {
+                if (graph[i][j] != 0) {
+                    Edge edge = new Edge();
+                    edge.u = i;
+                    edge.v = j;
+                    edge.w = graph[i][j];
+                    edges.add(edge);
+                }
+            }
+        }
+
+        // Sort edges by weight
+        Collections.sort(edges);
+
+        // Initialize parent array
+        parent = new int[V];
+        for (int i = 0; i < V; i++)
+            parent[i] = i;
+
+        int edgeCount = 0, minCost = 0;
+        System.out.println("Edges in the Minimum Spanning Tree:");
+
+        // Process edges one by one
+        for (Edge e : edges) {
+            int a = find(e.u);
+            int b = find(e.v);
+
+            // If including this edge does not form a cycle
+            if (a != b) {
+                System.out.println(e.u + " - " + e.v + " : " + e.w);
+                minCost += e.w;
+                union(a, b);
+                edgeCount++;
+                if (edgeCount == V - 1)
+                    break;
+            }
+        }
+
+        System.out.println("Minimum Cost of Spanning Tree = " + minCost);
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter the number of vertices: ");
+        V = sc.nextInt();
+
+        graph = new int[V][V];
+        System.out.println("Enter the adjacency (cost) matrix:");
+
+        for (int i = 0; i < V; i++)
+            for (int j = 0; j < V; j++)
+                graph[i][j] = sc.nextInt();
+
+        kruskalMST();
+
+        sc.close();
+    }
+}

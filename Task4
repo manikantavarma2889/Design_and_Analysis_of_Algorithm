@@ -1,0 +1,47 @@
+import java.util.Scanner;
+
+public class Task4a {
+
+    static final int MAX = 100;
+
+    // Function for Warshall's Transitive Closure
+    static void warshallTransitiveClosure(int[][] graph, int numVert) {
+        for (int k = 0; k < numVert; k++) {
+            for (int i = 0; i < numVert; i++) {
+                for (int j = 0; j < numVert; j++) {
+                    if (graph[i][j] == 1 || (graph[i][k] == 1 && graph[k][j] == 1))
+                        graph[i][j] = 1;
+                }
+            }
+        }
+    }
+
+    // Main function
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int[][] graph = new int[MAX][MAX];
+
+        System.out.println("Warshall's Transitive Closure");
+        System.out.print("Enter the number of vertices: ");
+        int numVert = sc.nextInt();
+
+        System.out.println("Enter the adjacency matrix:");
+        for (int i = 0; i < numVert; i++) {
+            for (int j = 0; j < numVert; j++) {
+                graph[i][j] = sc.nextInt();
+            }
+        }
+
+        warshallTransitiveClosure(graph, numVert);
+
+        System.out.println("\nThe transitive closure for the given graph is:");
+        for (int i = 0; i < numVert; i++) {
+            for (int j = 0; j < numVert; j++) {
+                System.out.print(graph[i][j] + "\t");
+            }
+            System.out.println();
+        }
+
+        sc.close();
+    }
+}

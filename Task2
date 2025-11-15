@@ -1,0 +1,67 @@
+public class Task2a {
+
+    // mergeSort function
+    static void mergeSort(int[] a, int p, int r) {
+        if (p < r) {
+            int q = (p + r) / 2;
+            mergeSort(a, p, q);
+            mergeSort(a, q + 1, r);
+            merge(a, p, q, r);
+        }
+    }
+
+    // function to merge two subarrays
+    static void merge(int[] a, int p, int q, int r) {
+        int[] b = new int[a.length]; // same size as a[]
+        int i = p;
+        int j = q + 1;
+        int k = 0;
+
+        // merge elements from both halves into b[]
+        while (i <= q && j <= r) {
+            if (a[i] < a[j]) {
+                b[k++] = a[i++];
+            } else {
+                b[k++] = a[j++];
+            }
+        }
+
+        // copy remaining elements from left half
+        while (i <= q) {
+            b[k++] = a[i++];
+        }
+
+        // copy remaining elements from right half
+        while (j <= r) {
+            b[k++] = a[j++];
+        }
+
+        // copy merged elements back into original array a[]
+        for (i = r; i >= p; i--) {
+            a[i] = b[--k];
+        }
+    }
+
+    // function to print the array
+    static void printArray(int[] a) {
+        for (int value : a) {
+            System.out.print(value + " ");
+        }
+        System.out.println();
+    }
+
+    // main function
+    public static void main(String[] args) {
+        int[] arr = {32, 45, 67, 2, 7};
+        int len = arr.length;
+
+        System.out.println("Given array:");
+        printArray(arr);
+
+        // calling merge sort
+        mergeSort(arr, 0, len - 1);
+
+        System.out.println("\nSorted array:");
+        printArray(arr);
+    }
+}
